@@ -87,7 +87,7 @@ The chart supports extensive configuration options. See the [full documentation]
 ### Production Deployment with Ingress
 ```bash
 helm install robotframework-dashboard robotframework-dashboard/robotframework-dashboard \
-  --namespace production \
+  --namespace dashboard \
   --set image.tag=1.1.3 \
   --set ingress.enabled=true \
   --set ingress.hostname=dashboard.example.com \
