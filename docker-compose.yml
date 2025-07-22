@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  robotframework-dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: robotframework-dashboard
+    ports:
+      - "8000:8000"
+    environment:
+      - ROBOTDASHBOARD_HOST=0.0.0.0
+      - ROBOTDASHBOARD_PORT=8000
+      - DATABASE_PATH=/app/data/robot_results.db
+      - LOG_DIR=/app/robot_logs
+    volumes:
+      - robot_data:/app/data
+      - robot_logs:/app/robot_logs
+      - ./uploads:/app/uploads  # Optional: for direct file uploads
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    networks:
+      - robot_network
+
+  # Optional: Nginx reverse proxy
+  nginx:
+    image: nginx:alpine
+    container_name: robotframework-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro  # Optional: SSL certificates
+    depends_on:
+      - robotframework-dashboard
+    restart: unless-stopped
+    networks:
+      - robot_network
+
+volumes:
+  robot_data:
+    driver: local
+  robot_logs:
+    driver: local
+
+networks:
+  robot_network:
+    driver: bridge

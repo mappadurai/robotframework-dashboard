@@ -1,0 +1,81 @@
+# Example values for production environment
+# Production-ready configuration with high availability and security
+
+replicaCount: 2
+
+image:
+  repository: sankaram04/robotframework-dashboard
+  pullPolicy: Always
+  tag: "latest"
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+  hosts:
+    - host: robotdashboard.yourdomain.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: robotdashboard-tls
+      hosts:
+        - robotdashboard.yourdomain.com
+
+persistence:
+  data:
+    enabled: true
+    storageClass: "fast-ssd"  # Use your production storage class
+    accessMode: ReadWriteOnce
+    size: 20Gi
+  logs:
+    enabled: true
+    storageClass: "fast-ssd"  # Use your production storage class
+    accessMode: ReadWriteOnce
+    size: 10Gi
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+# Pod security context
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 1000
+
+# Node selection for production nodes
+nodeSelector:
+  node-type: production
+
+# Tolerations for dedicated nodes
+tolerations:
+  - key: "production"
+    operator: "Equal"
+    value: "true"
+    effect: "NoSchedule"
+
+# Anti-affinity for high availability
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 100
+      podAffinityTerm:
+        labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+            - robotframework-dashboard
+        topologyKey: kubernetes.io/hostname

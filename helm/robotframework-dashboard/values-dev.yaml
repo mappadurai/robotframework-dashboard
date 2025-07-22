@@ -1,0 +1,38 @@
+# Example values for development environment
+# Minimal setup for local development
+
+replicaCount: 1
+
+image:
+  repository: sankaram04/robotframework-dashboard
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+service:
+  type: ClusterIP
+  port: 80
+
+# Disable ingress for local development
+ingress:
+  enabled: false
+
+# Disable persistence for development
+persistence:
+  data:
+    enabled: false
+  logs:
+    enabled: false
+
+# Minimal resources for development
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+# Environment variables
+env:
+  ROBOTDASHBOARD_HOST: "0.0.0.0"
+  ROBOTDASHBOARD_PORT: "8000"

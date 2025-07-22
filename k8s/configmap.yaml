@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: robotframework-dashboard-config
+  namespace: robotframework-dashboard
+data:
+  ROBOTDASHBOARD_HOST: "0.0.0.0"
+  ROBOTDASHBOARD_PORT: "8000"
+  DATABASE_PATH: "/app/data/robot_results.db"
+  LOG_DIR: "/app/robot_logs"
+---

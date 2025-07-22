@@ -1,0 +1,80 @@
+# Production values for robotframework-dashboard
+replicaCount: 1
+
+image:
+  repository: robotframework-dashboard
+  pullPolicy: Always
+  tag: "latest"
+
+nameOverride: ""
+fullnameOverride: ""
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8000
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt"
+  hosts:
+    - host: robotframework-dashboard.test.eagleeyenetworks.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: robotframework-dashboard-tls
+      hosts:
+        - robotframework-dashboard.test.eagleeyenetworks.com
+
+persistence:
+  data:
+    enabled: true
+    storageClass: "standard"
+    accessMode: ReadWriteOnce
+    size: 5Gi
+  logs:
+    enabled: true
+    storageClass: "standard"
+    accessMode: ReadWriteOnce
+    size: 2Gi
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 200m
+    memory: 256Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+env:
+  ROBOTDASHBOARD_HOST: "0.0.0.0"
+  ROBOTDASHBOARD_PORT: "8000"
+  DATABASE_PATH: "/app/data/robot_results.db"
+  LOG_DIR: "/app/robot_logs"
+
+livenessProbe:
+  httpGet:
+    path: /
+    port: 8000
+  initialDelaySeconds: 60
+  periodSeconds: 30
+  timeoutSeconds: 10
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /
+    port: 8000
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3

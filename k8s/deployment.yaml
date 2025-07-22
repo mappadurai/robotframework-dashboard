@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: robotframework-dashboard
+  namespace: robotframework-dashboard
+  labels:
+    app: robotframework-dashboard
+spec:
+  replicas: 1 # Single replica since SQLite doesn't support concurrent writes
+  selector:
+    matchLabels:
+      app: robotframework-dashboard
+  template:
+    metadata:
+      labels:
+        app: robotframework-dashboard
+    spec:
+      containers:
+      - name: robotframework-dashboard
+        image: robotframework-dashboard:latest # Replace with your image
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8000
+          name: http
+        env:
+        - name: ROBOTDASHBOARD_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: robotframework-dashboard-config
+              key: ROBOTDASHBOARD_HOST
+        - name: ROBOTDASHBOARD_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: robotframework-dashboard-config
+              key: ROBOTDASHBOARD_PORT
+        - name: DATABASE_PATH
+          valueFrom:
+            configMapKeyRef:
+              name: robotframework-dashboard-config
+              key: DATABASE_PATH
+        - name: LOG_DIR
+          valueFrom:
+            configMapKeyRef:
+              name: robotframework-dashboard-config
+              key: LOG_DIR
+        volumeMounts:
+        - name: data-volume
+          mountPath: /app/data
+        - name: logs-volume
+          mountPath: /app/robot_logs
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8000
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+      volumes:
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: robotframework-dashboard-data
+      - name: logs-volume
+        persistentVolumeClaim:
+          claimName: robotframework-dashboard-logs
+      restartPolicy: Always
+---

@@ -1,0 +1,58 @@
+# Version control
+.git
+.gitignore
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env
+pip-log.txt
+pip-delete-this-directory.txt
+.tox
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.venv
+venv/
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Local development files
+robot_results.db
+robot_dashboard.html
+robot_logs/
+*.xml
+*.html
+
+# Documentation
+README.md
+*.md
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Test outputs
+atest/resources/outputs/

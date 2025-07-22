@@ -1,0 +1,24 @@
+apiVersion: v2
+name: robotframework-dashboard
+description: A Helm chart for deploying Robot Framework Dashboard - A FastAPI web application for visualizing Robot Framework test results
+type: application
+version: 1.0.0
+appVersion: "0.9.4"
+keywords:
+  - robotframework
+  - testing
+  - dashboard
+  - automation
+  - test-results
+  - fastapi
+  - python
+home: https://github.com/sankaram04/robotframework-dashboard
+sources:
+  - https://github.com/timdegroot1996/robotframework-dashboard
+  - https://hub.docker.com/r/sankaram04/robotframework-dashboard
+maintainers:
+  - name: sankaram04
+    email: sankaram04@example.com
+annotations:
+  category: Testing
+  licenses: MIT

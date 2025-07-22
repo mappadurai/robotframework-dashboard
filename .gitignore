@@ -11,3 +11,26 @@ robot_dashboard*.html
 index.txt
 .pabotsuitenames
 *.db
+
+# Additional patterns for fork
+# Virtual environments
+venv/
+env/
+ENV/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local development
+.env
+.env.local
+
+# Temporary files
+*.tmp

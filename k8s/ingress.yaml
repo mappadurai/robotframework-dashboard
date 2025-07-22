@@ -1,0 +1,30 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: robotframework-dashboard-ingress
+  namespace: robotframework-dashboard
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/proxy-body-size: "100m" # Allow large file uploads
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+spec:
+  ingressClassName: nginx # Change this to your ingress class
+  rules:
+  - host: robotdashboard.your-domain.com # Replace with your domain
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: robotframework-dashboard-service
+            port:
+              number: 80
+  # Uncomment below for TLS/SSL
+  # tls:
+  # - hosts:
+  #   - robotdashboard.your-domain.com
+  #   secretName: robotdashboard-tls
+---
