@@ -22,7 +22,7 @@ helm install my-robotframework-dashboard robotframework-dashboard/robotframework
 
 | Chart | Description | App Version | Chart Version |
 |-------|-------------|-------------|---------------|
-| [robotframework-dashboard](https://github.com/mappadurai/robotframework-dashboard) | A FastAPI web application for visualizing Robot Framework test results | 1.1.3 | 1.0.0 |
+| [robotframework-dashboard](https://github.com/mappadurai/robotframework-dashboard) | A FastAPI web application for visualizing Robot Framework test results | 1.1.3 | 1.0.1 |
 
 ## Installation Options
 
