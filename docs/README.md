@@ -9,170 +9,112 @@ This is the official Helm repository for Robot Framework Dashboard.
 helm repo add robotframework-dashboard https://mappadurai.github.io/robotframework-dashboard/
 helm repo update
 
-# Install the chart
-helm install my-robotframework-dashboard robotframework-dashboard/robotframework-dashboard
+# Simple installation with ingress
+helm install robotframework-dashboard robotframework-dashboard/robotframework-dashboard \
+  --set ingress.enabled=true \
+  --set ingress.hostname=your-domain.com
+```
 
-# Install with custom values
-helm install my-robotframework-dashboard robotframework-dashboard/robotframework-dashboard \
+## Simple Deployment Examples
+
+### Basic Installation (No Ingress)
+```bash
+helm install robotframework-dashboard robotframework-dashboard/robotframework-dashboard
+```
+
+### With Ingress (Recommended)
+```bash
+helm install robotframework-dashboard robotframework-dashboard/robotframework-dashboard \
   --set ingress.enabled=true \
   --set ingress.hostname=dashboard.example.com
+```
+
+### With Custom Namespace
+```bash
+kubectl create namespace dashboard
+helm install robotframework-dashboard robotframework-dashboard/robotframework-dashboard \
+  --namespace dashboard \
+  --set ingress.enabled=true \
+  --set ingress.hostname=dashboard.example.com
+```
+
+### With Custom Storage
+```bash
+helm install robotframework-dashboard robotframework-dashboard/robotframework-dashboard \
+  --set ingress.enabled=true \
+  --set ingress.hostname=dashboard.example.com \
+  --set persistence.data.storageClass=fast-ssd \
+  --set persistence.logs.storageClass=fast-ssd
 ```
 
 ## Available Charts
 
 | Chart | Description | App Version | Chart Version |
 |-------|-------------|-------------|---------------|
-| [robotframework-dashboard](https://github.com/mappadurai/robotframework-dashboard) | A FastAPI web application for visualizing Robot Framework test results | 1.1.3 | 1.0.1 |
+| [robotframework-dashboard](https://github.com/mappadurai/robotframework-dashboard) | A FastAPI web application for visualizing Robot Framework test results | 1.1.3 | 1.0.2 |
 
-## Installation Options
+## Key Features
 
-### Option 1: Default Installation
-```bash
-helm install robotframework-dashboard robotframework-dashboard/robotframework-dashboard
-```
+- **Simple Deployment**: One command with hostname sets up ingress and TLS automatically
+- **Persistent Storage**: Data and logs are preserved across pod restarts
+- **TLS Ready**: Automatic Let's Encrypt certificate management with cert-manager
+- **Flexible Configuration**: Support for custom storage classes, resources, and namespaces
 
-### Option 2: With Ingress (Simple)
-```bash
-helm install robotframework-dashboard robotframework-dashboard/robotframework-dashboard \
-  --set ingress.enabled=true \
-  --set ingress.hostname=your-domain.com
-```
+## Requirements
 
-### Option 3: With Ingress (Advanced)
-```bash
-helm install robotframework-dashboard robotframework-dashboard/robotframework-dashboard \
-  --set ingress.enabled=true \
-  --set ingress.className=nginx \
-  --set "ingress.hosts[0].host=your-domain.com" \
-  --set "ingress.hosts[0].paths[0].path=/" \
-  --set "ingress.hosts[0].paths[0].pathType=Prefix"
-```
+- Kubernetes 1.19+
+- Helm 3.2.0+
+- Ingress Controller (nginx recommended)
+- cert-manager (for TLS certificates)
 
-### Option 4: With Custom Storage Class
-```bash
-helm install robotframework-dashboard robotframework-dashboard/robotframework-dashboard \
-  --set persistence.data.storageClass=fast-ssd \
-  --set persistence.logs.storageClass=fast-ssd
-```
-
-### Option 5: With Custom Namespace
-```bash
-kubectl create namespace robotframework-dashboard
-helm install robotframework-dashboard robotframework-dashboard/robotframework-dashboard \
-  --namespace robotframework-dashboard
-```
-
-## Configuration
-
-The chart supports extensive configuration options. See the [full documentation](https://github.com/mappadurai/robotframework-dashboard/tree/main/helm/robotframework-dashboard) for all available values.
-
-### Key Configuration Options
+## Configuration Options
 
 | Parameter | Description | Default |
 |-----------|-------------|---------|
-| `image.repository` | Container image repository | `sankaram04/robotframework-dashboard` |
-| `image.tag` | Container image tag | `1.1.3` |
 | `ingress.enabled` | Enable ingress | `false` |
-| `ingress.hostname` | Simple hostname setup | `""` |
+| `ingress.hostname` | Simple hostname setup (recommended) | `""` |
 | `ingress.className` | Ingress class name | `nginx` |
-| `persistence.data.enabled` | Enable data persistence | `true` |
 | `persistence.data.storageClass` | Storage class for data | `standard` |
-| `persistence.data.size` | Data storage size | `5Gi` |
-| `persistence.logs.enabled` | Enable logs persistence | `true` |
 | `persistence.logs.storageClass` | Storage class for logs | `standard` |
-| `persistence.logs.size` | Logs storage size | `2Gi` |
+| `image.tag` | Container image tag | `latest` |
 
-## Common Deployment Examples
-
-### Production Deployment with Ingress
-```bash
-helm install robotframework-dashboard robotframework-dashboard/robotframework-dashboard \
-  --namespace dashboard \
-  --set image.tag=1.1.3 \
-  --set ingress.enabled=true \
-  --set ingress.hostname=dashboard.example.com \
-  --set ingress.className=nginx \
-  --set persistence.data.storageClass=fast-ssd \
-  --set persistence.logs.storageClass=fast-ssd
-```
-
-### Development Setup (No Persistence)
-```bash
-helm install robotframework-dashboard robotframework-dashboard/robotframework-dashboard \
-  --set persistence.data.enabled=false \
-  --set persistence.logs.enabled=false
-```
-
-### Custom Resource Limits
-```bash
-helm install robotframework-dashboard robotframework-dashboard/robotframework-dashboard \
-  --set resources.requests.memory=512Mi \
-  --set resources.requests.cpu=500m \
-  --set resources.limits.memory=1Gi \
-  --set resources.limits.cpu=1000m
-```
+For advanced configuration options, see the [full documentation](https://github.com/mappadurai/robotframework-dashboard/tree/main/helm/robotframework-dashboard).
 
 ## Docker Image
 
-The chart uses the official Docker image: [`sankaram04/robotframework-dashboard`](https://hub.docker.com/r/sankaram04/robotframework-dashboard)
-
-```bash
-docker pull sankaram04/robotframework-dashboard:1.1.3
-```
-
-## Source Code
-
-- **Chart Source**: [GitHub - mappadurai/robotframework-dashboard](https://github.com/mappadurai/robotframework-dashboard)
-- **Upstream Source**: [GitHub - timdegroot1996/robotframework-dashboard](https://github.com/timdegroot1996/robotframework-dashboard)
+Uses the official Docker image: [`sankaram04/robotframework-dashboard`](https://hub.docker.com/r/sankaram04/robotframework-dashboard)
 
 ## Troubleshooting
 
 ### Common Issues
 
-#### 1. Ingress Configuration Error
-```
-Error: template: robotframework-dashboard/templates/ingress.yaml:18:21: executing "robotframework-dashboard/templates/ingress.yaml" at <.Values.ingress.tls>: range can't iterate over true
-```
-
-**Solution**: Use proper ingress configuration:
+#### 1. Simple Hostname Not Working
+**Solution**: Ensure you're using the latest chart version (1.0.2+):
 ```bash
-# Simple hostname approach (recommended)
---set ingress.hostname=your-domain.com
-
-# OR advanced hosts configuration
---set "ingress.hosts[0].host=your-domain.com" \
---set "ingress.hosts[0].paths[0].path=/" \
---set "ingress.hosts[0].paths[0].pathType=Prefix"
+helm repo update
+helm upgrade robotframework-dashboard robotframework-dashboard/robotframework-dashboard \
+  --set ingress.enabled=true \
+  --set ingress.hostname=your-domain.com
 ```
 
 #### 2. Storage Class Issues
-If you get PVC pending issues, check available storage classes:
+Check available storage classes and specify the correct one:
 ```bash
 kubectl get storageclass
+# Then use: --set persistence.data.storageClass=your-storage-class
 ```
 
-Then specify the correct storage class:
-```bash
---set persistence.data.storageClass=your-storage-class
---set persistence.logs.storageClass=your-storage-class
-```
-
-#### 3. Pod CrashLoopBackOff
+#### 3. Pod Issues
 Check pod logs:
 ```bash
-kubectl logs -n <namespace> deployment/robotframework-dashboard
+kubectl logs -l app.kubernetes.io/name=robotframework-dashboard
 ```
-
-Common fixes:
-- Ensure proper resource limits
-- Check persistent volume permissions
-- Verify image tag exists
 
 ## Support
 
 - **Issues**: [GitHub Issues](https://github.com/mappadurai/robotframework-dashboard/issues)
-- **Documentation**: [README](https://github.com/mappadurai/robotframework-dashboard/blob/main/README.md)
-- **Helm Chart**: [Chart Documentation](https://github.com/mappadurai/robotframework-dashboard/tree/main/helm/robotframework-dashboard)
+- **Chart Documentation**: [Helm Chart](https://github.com/mappadurai/robotframework-dashboard/tree/main/helm/robotframework-dashboard)
+- **Upstream Project**: [timdegroot1996/robotframework-dashboard](https://github.com/timdegroot1996/robotframework-dashboard)
 
 ## License
 
