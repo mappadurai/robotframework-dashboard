@@ -15,10 +15,13 @@ service:
   targetPort: 8000
 
 ingress:
-  enabled: true
+  enabled: false
   className: "nginx"
+  # Simple hostname configuration - use this for single domain setup
+  hostname: ""
   annotations:
     cert-manager.io/cluster-issuer: "letsencrypt"
+  # Advanced hosts configuration - use this for multiple domains or custom paths
   hosts:
     - host: robotframework-dashboard.example.com
       paths:
