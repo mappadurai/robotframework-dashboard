@@ -2,7 +2,7 @@
 replicaCount: 1
 
 image:
-  repository: robotframework-dashboard
+  repository: sankaram04/robotframework-dashboard
   pullPolicy: Always
   tag: "latest"
 
@@ -20,14 +20,14 @@ ingress:
   annotations:
     cert-manager.io/cluster-issuer: "letsencrypt"
   hosts:
-    - host: robotframework-dashboard.test.eagleeyenetworks.com
+    - host: robotframework-dashboard.example.com
       paths:
         - path: /
           pathType: Prefix
   tls:
     - secretName: robotframework-dashboard-tls
       hosts:
-        - robotframework-dashboard.test.eagleeyenetworks.com
+        - robotframework-dashboard.example.com
 
 persistence:
   data:

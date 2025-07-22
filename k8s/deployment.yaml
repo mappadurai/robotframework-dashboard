@@ -17,8 +17,8 @@ spec:
     spec:
       containers:
       - name: robotframework-dashboard
-        image: robotframework-dashboard:latest # Replace with your image
-        imagePullPolicy: Never
+        image: sankaram04/robotframework-dashboard:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 8000
           name: http

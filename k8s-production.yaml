@@ -98,7 +98,7 @@ spec:
             
             echo "Cloning repository..."
             cd /tmp
-            git clone https://github.com/een-tms/robotframework-dashboard.git app || true
+            git clone https://github.com/sankaram04/robotframework-dashboard.git app || true
             if [ ! -d "app" ]; then
               echo "Creating app structure..."
               mkdir -p app/robotframework_dashboard
@@ -243,9 +243,9 @@ spec:
   tls:
   - secretName: robotframework-dashboard-tls
     hosts:
-    - robotframework-dashboard.test.eagleeyenetworks.com
+    - robotframework-dashboard.example.com
   rules:
-  - host: robotframework-dashboard.test.eagleeyenetworks.com
+  - host: robotframework-dashboard.example.com
     http:
       paths:
       - path: /

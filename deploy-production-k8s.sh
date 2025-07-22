@@ -79,7 +79,7 @@ kubectl get ingress -n $NAMESPACE
 
 echo ""
 echo "🌐 Your application should be available at:"
-echo "   https://robotframework-dashboard.test.eagleeyenetworks.com"
+echo "   https://robotframework-dashboard.example.com"
 echo ""
 echo "📝 To check logs:"
 echo "   kubectl logs -f deployment/robotframework-dashboard -n $NAMESPACE"

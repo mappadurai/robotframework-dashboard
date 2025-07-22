@@ -58,12 +58,12 @@ kubectl apply -f k8s/
 
 The production image is available at:
 ```
-harbor.eencloud.com/test/robotframework-dashboard:latest
+sankaram04/robotframework-dashboard:latest
 ```
 
 ## 🌐 Production Access
 
-- **URL:** https://robotframework-dashboard.test.eagleeyenetworks.com
+- **URL:** https://robotframework-dashboard.example.com
 - **Namespace:** qa-auto-test
 - **Ingress:** Nginx with Let's Encrypt TLS
 
