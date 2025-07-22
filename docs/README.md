@@ -51,8 +51,8 @@ helm install robotframework-dashboard robotframework-dashboard/robotframework-da
 ### Option 4: With Custom Storage Class
 ```bash
 helm install robotframework-dashboard robotframework-dashboard/robotframework-dashboard \
-  --set persistence.data.storageClass=ceph-block \
-  --set persistence.logs.storageClass=ceph-block
+  --set persistence.data.storageClass=fast-ssd \
+  --set persistence.logs.storageClass=fast-ssd
 ```
 
 ### Option 5: With Custom Namespace
@@ -87,13 +87,13 @@ The chart supports extensive configuration options. See the [full documentation]
 ### Production Deployment with Ingress
 ```bash
 helm install robotframework-dashboard robotframework-dashboard/robotframework-dashboard \
-  --namespace qa-auto-test \
+  --namespace production \
   --set image.tag=1.1.3 \
   --set ingress.enabled=true \
-  --set ingress.hostname=robotframework-dashboard.test.eagleeyenetworks.com \
+  --set ingress.hostname=dashboard.example.com \
   --set ingress.className=nginx \
-  --set persistence.data.storageClass=ceph-block \
-  --set persistence.logs.storageClass=ceph-block
+  --set persistence.data.storageClass=fast-ssd \
+  --set persistence.logs.storageClass=fast-ssd
 ```
 
 ### Development Setup (No Persistence)
