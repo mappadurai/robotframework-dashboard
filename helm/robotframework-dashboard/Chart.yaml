@@ -12,9 +12,10 @@ keywords:
   - test-results
   - fastapi
   - python
-home: https://github.com/sankaram04/robotframework-dashboard
+home: https://github.com/mappadurai/robotframework-dashboard
 sources:
   - https://github.com/timdegroot1996/robotframework-dashboard
+  - https://github.com/mappadurai/robotframework-dashboard
   - https://hub.docker.com/r/sankaram04/robotframework-dashboard
 maintainers:
   - name: sankaram04
