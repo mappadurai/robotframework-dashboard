@@ -6,7 +6,37 @@ entries:
       licenses: MIT
     apiVersion: v2
     appVersion: 1.1.3
-    created: "2025-07-22T22:59:18.725272238Z"
+    created: "2025-07-23T08:21:38.641984+09:00"
+    description: A Helm chart for deploying Robot Framework Dashboard - A FastAPI
+      web application for visualizing Robot Framework test results
+    digest: aa3e467a46aee5d7d9aaa3d6a3fdd959ab05ee211bf3d1baa6e068788c61021e
+    home: https://github.com/mappadurai/robotframework-dashboard
+    keywords:
+    - robotframework
+    - testing
+    - dashboard
+    - automation
+    - test-results
+    - fastapi
+    - python
+    maintainers:
+    - email: sankaram04@example.com
+      name: sankaram04
+    name: robotframework-dashboard
+    sources:
+    - https://github.com/timdegroot1996/robotframework-dashboard
+    - https://github.com/mappadurai/robotframework-dashboard
+    - https://hub.docker.com/r/sankaram04/robotframework-dashboard
+    type: application
+    urls:
+    - https://mappadurai.github.io/robotframework-dashboard/robotframework-dashboard-1.0.2.tgz
+    version: 1.0.2
+  - annotations:
+      category: Testing
+      licenses: MIT
+    apiVersion: v2
+    appVersion: 1.1.3
+    created: "2025-07-23T08:21:38.640979+09:00"
     description: A Helm chart for deploying Robot Framework Dashboard - A FastAPI
       web application for visualizing Robot Framework test results
     digest: 93e2383a68d4f034a5bd16fbb4a6e517e4dec0813a583be6c04fb40fc2ba193a
@@ -31,4 +61,4 @@ entries:
     urls:
     - https://mappadurai.github.io/robotframework-dashboard/robotframework-dashboard-1.0.1.tgz
     version: 1.0.1
-generated: "2025-07-22T22:59:18.724629037Z"
+generated: "2025-07-23T08:21:38.638865+09:00"
