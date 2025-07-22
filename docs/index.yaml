@@ -6,7 +6,7 @@ entries:
       licenses: MIT
     apiVersion: v2
     appVersion: 1.1.3
-    created: "2025-07-22T20:50:53.800054+09:00"
+    created: "2025-07-23T07:55:31.977782+09:00"
     description: A Helm chart for deploying Robot Framework Dashboard - A FastAPI
       web application for visualizing Robot Framework test results
     digest: 1b86836499f04d912ac89a5a1afccdec17bcfd19add8b05530c6a3876d2fb403
@@ -31,4 +31,4 @@ entries:
     urls:
     - https://mappadurai.github.io/robotframework-dashboard/robotframework-dashboard-1.0.1.tgz
     version: 1.0.1
-generated: "2025-07-22T20:50:53.799283+09:00"
+generated: "2025-07-23T07:55:31.975601+09:00"
