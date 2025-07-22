@@ -1,0 +1,63 @@
+name: Update Helm Repository
+
+on:
+  push:
+    paths:
+      - 'helm/**'
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  CHART_DIR: helm/robotframework-dashboard
+  DOCS_DIR: docs
+
+jobs:
+  update-helm-repo:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Helm
+      uses: azure/setup-helm@v4
+      with:
+        version: '3.14.0'
+
+    - name: Package Helm chart
+      run: |
+        helm package ${{ env.CHART_DIR }} -d ${{ env.DOCS_DIR }}
+
+    - name: Update Helm repository index
+      run: |
+        helm repo index ${{ env.DOCS_DIR }} --url https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
+
+    - name: Commit and push changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add ${{ env.DOCS_DIR }}
+        if git diff --staged --quiet; then
+          echo "No changes to commit"
+        else
+          git commit -m "Update Helm repository [skip ci]"
+          git push
+        fi
+
+    - name: Setup Pages
+      if: github.ref == 'refs/heads/main'
+      uses: actions/configure-pages@v4
+
+    - name: Upload Pages artifact
+      if: github.ref == 'refs/heads/main'
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: ${{ env.DOCS_DIR }}
+
+    - name: Deploy to GitHub Pages
+      if: github.ref == 'refs/heads/main'
+      uses: actions/deploy-pages@v4

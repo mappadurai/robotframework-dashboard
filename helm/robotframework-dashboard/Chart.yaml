@@ -3,7 +3,7 @@ name: robotframework-dashboard
 description: A Helm chart for deploying Robot Framework Dashboard - A FastAPI web application for visualizing Robot Framework test results
 type: application
 version: 1.0.0
-appVersion: "0.9.4"
+appVersion: "1.1.3"
 keywords:
   - robotframework
   - testing
