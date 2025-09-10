@@ -43,16 +43,23 @@ jobs:
         fi
         
         COMMITS_BEHIND=$(git rev-list --count HEAD..upstream/main)
-        echo "🔄 Fork is $COMMITS_BEHIND commits behind upstream"
+        COMMITS_AHEAD=$(git rev-list --count upstream/main..HEAD)
+        
+        echo "� Status: $COMMITS_BEHIND commits behind, $COMMITS_AHEAD commits ahead"
+        
+        if [ "$COMMITS_BEHIND" -eq 0 ]; then
+          echo "✅ Fork is up to date or ahead of upstream - no sync needed"
+          exit 0
+        fi
         
         # Get list of new commits for logging
         echo "New commits from upstream:"
         git log --oneline HEAD..upstream/main
         
-        # Check if we can fast-forward (no conflicts)
-        if git merge-base --is-ancestor HEAD upstream/main; then
-          echo "✅ Fast-forward merge possible"
-          git merge upstream/main --no-edit
+        # Try to merge upstream changes
+        echo "🔄 Attempting to merge upstream changes..."
+        if git merge upstream/main --no-edit; then
+          echo "✅ Successfully merged upstream changes"
           
           # Push the changes
           git push origin main
@@ -61,7 +68,8 @@ jobs:
           echo "Updated commits:"
           git log --oneline $CURRENT_HASH..HEAD
         else
-          echo "⚠️ Cannot auto-merge - conflicts may exist"
+          echo "❌ Merge failed - conflicts exist"
           echo "Manual intervention required for merge conflicts"
+          git merge --abort
           exit 1
         fi
