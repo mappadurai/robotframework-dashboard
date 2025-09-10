@@ -9,6 +9,10 @@ on:
 jobs:
   sync:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
     
     steps:
     - name: Checkout
@@ -21,28 +25,15 @@ jobs:
       run: |
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        git config --global pull.rebase false
 
-    - name: Setup upstream remote
+    - name: Add upstream remote
       run: |
-        if git remote get-url upstream 2>/dev/null; then
-          echo "Upstream remote already exists"
-          git remote set-url upstream https://github.com/timdegroot1996/robotframework-dashboard.git
-        else
-          echo "Adding upstream remote"
-          git remote add upstream https://github.com/timdegroot1996/robotframework-dashboard.git
-        fi
-
-    - name: Fetch upstream changes
-      run: |
-        echo "Fetching upstream changes..."
-        git fetch upstream main --no-tags
-        git fetch origin main
+        git remote add upstream https://github.com/timdegroot1996/robotframework-dashboard.git || true
+        git fetch upstream main
 
     - name: Check for changes
-      id: check-changes
+      id: check
       run: |
-        # Get the latest commit hashes
         UPSTREAM_HASH=$(git rev-parse upstream/main)
         CURRENT_HASH=$(git rev-parse HEAD)
         
@@ -50,97 +41,75 @@ jobs:
         echo "Upstream HEAD: $UPSTREAM_HASH"
         
         if [ "$UPSTREAM_HASH" = "$CURRENT_HASH" ]; then
-          echo "✅ Fork is already up to date with upstream"
-          echo "has_changes=false" >> $GITHUB_OUTPUT
-          exit 0
-        fi
-        
-        # Count commits behind
-        COMMITS_BEHIND=$(git rev-list --count HEAD..upstream/main)
-        echo "Commits behind upstream: $COMMITS_BEHIND"
-        
-        # Check if we can fast-forward merge
-        MERGE_BASE=$(git merge-base HEAD upstream/main)
-        
-        if [ "$MERGE_BASE" = "$CURRENT_HASH" ]; then
-          echo "🚀 Fast-forward merge possible"
-          MERGE_TYPE="fast-forward"
+          echo "✅ Fork is up to date with upstream"
+          echo "needs_sync=false" >> $GITHUB_OUTPUT
         else
-          echo "⚠️ Non-fast-forward merge required"
-          MERGE_TYPE="merge-commit"
+          COMMITS_BEHIND=$(git rev-list --count HEAD..upstream/main)
+          echo "🔄 Fork is $COMMITS_BEHIND commits behind upstream"
+          echo "needs_sync=true" >> $GITHUB_OUTPUT
+          echo "commits_behind=$COMMITS_BEHIND" >> $GITHUB_OUTPUT
+          echo "upstream_hash=$UPSTREAM_HASH" >> $GITHUB_OUTPUT
         fi
-        
-        # Save outputs for PR creation
-        echo "has_changes=true" >> $GITHUB_OUTPUT
-        echo "commits_behind=$COMMITS_BEHIND" >> $GITHUB_OUTPUT
-        echo "merge_type=$MERGE_TYPE" >> $GITHUB_OUTPUT
-        echo "upstream_hash=$UPSTREAM_HASH" >> $GITHUB_OUTPUT
 
-    - name: Create sync notification file
-      if: steps.check-changes.outputs.has_changes == 'true'
-      run: |
-        # Create a temporary file to trigger PR creation
-        mkdir -p .github/sync
-        cat > .github/sync/upstream-sync-notification.md << EOF
-        # Upstream Sync Notification
-        
-        **Date:** $(date)
-        **Commits behind:** ${{ steps.check-changes.outputs.commits_behind }}
-        **Upstream commit:** ${{ steps.check-changes.outputs.upstream_hash }}
-        
-        ## Manual Sync Commands:
-        \`\`\`bash
-        git remote add upstream https://github.com/timdegroot1996/robotframework-dashboard.git
-        git fetch upstream main
-        git merge upstream/main
-        git push origin main
-        \`\`\`
-        
-        Delete this file after syncing.
-        EOF
-
-    - name: Create Pull Request
-      if: steps.check-changes.outputs.has_changes == 'true'
-      uses: peter-evans/create-pull-request@v5
+    - name: Create Issue for Manual Sync
+      if: steps.check.outputs.needs_sync == 'true'
+      uses: actions/github-script@v7
       with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        add-paths: |
-          .github/sync/
-        commit-message: "Sync notification: ${{ steps.check-changes.outputs.commits_behind }} commits behind upstream"
-        committer: github-actions[bot] <github-actions[bot]@users.noreply.github.com>
-        author: github-actions[bot] <github-actions[bot]@users.noreply.github.com>
-        title: "🔄 Upstream Sync Required (${{ steps.check-changes.outputs.commits_behind }} commits behind)"
-        body: |
-          ## 🔄 Upstream Sync Notification
+        script: |
+          const issueBody = `## 🔄 Fork Sync Required
           
-          Your fork is **${{ steps.check-changes.outputs.commits_behind }} commits** behind upstream.
+          Your fork is **${{ steps.check.outputs.commits_behind }}** commits behind upstream.
           
           **📊 Details:**
-          - **Commits behind:** ${{ steps.check-changes.outputs.commits_behind }}
-          - **Merge type:** ${{ steps.check-changes.outputs.merge_type }}
-          - **Upstream commit:** `${{ steps.check-changes.outputs.upstream_hash }}`
+          - **Commits behind:** ${{ steps.check.outputs.commits_behind }}
+          - **Upstream commit:** \`${{ steps.check.outputs.upstream_hash }}\`
           
           **🔗 Links:**
           - [Upstream Repository](https://github.com/timdegroot1996/robotframework-dashboard)
-          - [Compare Changes](https://github.com/timdegroot1996/robotframework-dashboard/compare/${{ github.sha }}..${{ steps.check-changes.outputs.upstream_hash }})
+          - [Compare Changes](https://github.com/timdegroot1996/robotframework-dashboard/compare/${{ github.sha }}...${{ steps.check.outputs.upstream_hash }})
           
-          **🚀 Quick Sync (recommended):**
-          ```bash
-          # Add upstream and sync
-          git remote add upstream https://github.com/timdegroot1996/robotframework-dashboard.git || git remote set-url upstream https://github.com/timdegroot1996/robotframework-dashboard.git
+          **🚀 Sync Commands:**
+          \`\`\`bash
+          # Method 1: Using GitHub CLI (recommended)
+          gh repo sync ${{ github.repository }} --source timdegroot1996/robotframework-dashboard
+          
+          # Method 2: Using git commands
+          git remote add upstream https://github.com/timdegroot1996/robotframework-dashboard.git
           git fetch upstream main
+          git checkout main
           git merge upstream/main
           git push origin main
+          \`\`\`
           
-          # Clean up
-          rm -rf .github/sync/
-          git add .github/sync/ && git commit -m "Remove sync notification after manual sync" && git push
-          ```
-          
-          **✅ After syncing:** Close this PR and delete the sync notification file.
+          **✅ After syncing:** Close this issue.
           
           ---
-          🤖 *Auto-generated sync notification*
-        branch: sync-notification
-        delete-branch: true
-        base: main
+          🤖 *Auto-generated sync notification*`;
+          
+          // Check if there's already an open sync issue
+          const existingIssues = await github.rest.issues.listForRepo({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            labels: 'sync',
+            state: 'open'
+          });
+          
+          if (existingIssues.data.length > 0) {
+            console.log('Sync issue already exists, updating it...');
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: existingIssues.data[0].number,
+              title: `🔄 Fork Sync Required (${{ steps.check.outputs.commits_behind }} commits behind)`,
+              body: issueBody
+            });
+          } else {
+            console.log('Creating new sync issue...');
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `🔄 Fork Sync Required (${{ steps.check.outputs.commits_behind }} commits behind)`,
+              body: issueBody,
+              labels: ['sync', 'automation']
+            });
+          }
