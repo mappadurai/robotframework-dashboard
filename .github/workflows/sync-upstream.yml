@@ -35,29 +35,42 @@ jobs:
       run: |
         if git diff --quiet HEAD upstream/main; then
           echo "changes=false" >> $GITHUB_OUTPUT
+          echo "No new changes from upstream"
         else
           echo "changes=true" >> $GITHUB_OUTPUT
+          echo "New changes detected from upstream"
         fi
 
-    - name: Merge upstream changes
+    - name: Create sync branch and merge upstream
       if: steps.check.outputs.changes == 'true'
       run: |
-        git checkout main
+        git checkout -b sync-upstream-$(date +%Y%m%d-%H%M%S)
         git merge upstream/main --no-edit
 
-    - name: Push changes
+    - name: Create Pull Request
       if: steps.check.outputs.changes == 'true'
-      run: |
-        git push origin main
-
-    - name: Create Pull Request for conflicts
-      if: failure()
       uses: peter-evans/create-pull-request@v5
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        commit-message: "Sync with upstream - manual merge required"
-        title: "Sync with upstream - conflicts detected"
+        commit-message: "Sync with upstream changes"
+        title: "🔄 Sync with upstream - $(date +%Y-%m-%d)"
         body: |
-          This PR was automatically created because there were conflicts when trying to sync with upstream.
-          Please review and merge manually.
-        branch: auto-sync-conflicts
+          ## Upstream Sync
+
+          This PR automatically syncs the latest changes from the upstream repository.
+
+          **Upstream Repository:** https://github.com/timdegroot1996/robotframework-dashboard
+
+          ### What to do:
+          1. Review the changes below
+          2. If everything looks good, merge this PR
+          3. If there are conflicts, resolve them manually
+
+          ### Changes:
+          - Synced with latest upstream commits
+          - No conflicts detected (clean merge)
+
+          ---
+          *This PR was automatically created by the sync workflow*
+        branch: sync-upstream-${{ github.run_number }}
+        delete-branch: true
